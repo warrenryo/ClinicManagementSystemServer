@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Requests\Requests;
+
+use App\DTO\Response\GetPaginatedDTO;
+use App\Helpers\Token;
+use Illuminate\Foundation\Http\FormRequest;
+
+class GetPaginatedRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'Take' => 'integer|min:1|max:500',
+            'Skip' => 'integer',
+            'SearchValue' => 'nullable|string|max:255'
+        ];
+    }
+
+    public function toDTO(): GetPaginatedDTO
+    {
+        return new GetPaginatedDTO(
+            take: $this->input('Take', 10),
+            skip: $this->input('Skip', 0),
+            searchValue: $this->input('SearchValue')
+        );
+    }
+}
