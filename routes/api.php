@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -50,6 +51,13 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::get('get-all-users-paginated', 'GetAllUserPaginated');
             Route::put('toggle-user-status/{id}', 'ToggleUserStatus');
             Route::get('get-all-users-list', 'GetAllUsersList');
+        });
+    });
+
+    Route::group(['prefix' => 'appointment'], function () {
+        Route::controller(AppointmentController::class)->group(function () {
+            Route::post('create-appointment', 'CreateAppointment');
+            Route::get('get-appointment-dates', 'GetAppointmentDates');
         });
     });
 });

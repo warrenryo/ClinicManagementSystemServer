@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\UserService;
 
 use App\DTO\Response\GetPaginatedDTO;
 use App\DTO\Response\PaginatedTableResponse;
@@ -93,35 +93,41 @@ class UserService implements IUserService
     public function GetAllUsersPaginated(GetPaginatedDTO $request)
     {
         try {
-            $query = User::query();
 
-            if (!empty($request->searchValue)) {
-                $query->where(function ($q) use ($request) {
-                    $search = $request->searchValue;
+            $query = User::query()
+                ->search(
+                    $request->SearchValue,
+                    ['email'], // columns on User
+                    ['UserDetails' => ['first_name', 'last_name']] // relation columns
+                );
 
-                    $q->where('email', 'LIKE', "%{$search}%")
-                        ->orWhereHas('UserDetails', function ($subQuery) use ($search) {
-                            $subQuery->where('first_name', 'LIKE', "%{$search}%")
-                                ->orWhere('last_name', 'LIKE', "%{$search}%");
-                        });
-                });
-            }
+            // if (!empty($request->searchValue)) {
+            //     $query->where(function ($q) use ($request) {
+            //         $search = $request->searchValue;
+
+            //         $q->where('email', 'LIKE', "%{$search}%")
+            //             ->orWhereHas('UserDetails', function ($subQuery) use ($search) {
+            //                 $subQuery->where('first_name', 'LIKE', "%{$search}%")
+            //                     ->orWhere('last_name', 'LIKE', "%{$search}%");
+            //             });
+            //     });
+            // }
 
             $count = $query->count();
 
             $users = $query
-                ->orderBy('id', 'DESC')
-                ->skip($request->skip)
-                ->take($request->take)
+                ->orderBy('created_at', 'desc')
+                ->skip($request->Skip)
+                ->take($request->Take)
                 ->get();
 
             $result_data = $users->map(function ($user) {
                 return [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'full_name' => $user->UserDetails->first_name . ' ' . $user->UserDetails->last_name,
-                    'role' => $user->role,
-                    'is_active' => (bool)$user->is_active
+                    'Id' => $user->id,
+                    'Email' => $user->email,
+                    'FullName' => $user->UserDetails->first_name . ' ' . $user->UserDetails->last_name,
+                    'Role' => $user->role,
+                    'Active' => (bool)$user->is_active
                 ];
             })->toArray();
 

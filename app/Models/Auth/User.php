@@ -4,6 +4,7 @@ namespace App\Models\Auth;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRoles;
+use App\Helpers\SearchableTrait;
 use Illuminate\Support\Str;
 use App\Models\Auth\UserDetails;
 use Illuminate\Notifications\Notifiable;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SearchableTrait;
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -64,7 +65,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function UserDetails()
+    public function userDetails()
     {
         return $this->hasOne(UserDetails::class, 'user_id', 'id');
     }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('MEMBER');
+            $table->integer('role');
             $table->json('user_access')->nullable();
             $table->boolean('is_active')->default(true);
             $table->text('access_token')->default('');

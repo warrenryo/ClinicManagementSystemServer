@@ -2,6 +2,7 @@
 
 namespace App\Models\Auth;
 
+use App\Models\Students\StudentDetails;
 use Illuminate\Database\Eloquent\Model;
 
 class UserDetails extends Model
@@ -19,8 +20,13 @@ class UserDetails extends Model
         'positions_id'
     ];
 
-    public function User()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function studentDetails()
+    {
+        return $this->hasOne(StudentDetails::class, 'user_details_id', 'id');
     }
 }

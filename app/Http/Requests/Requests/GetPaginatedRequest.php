@@ -33,9 +33,9 @@ class GetPaginatedRequest extends FormRequest
     public function toDTO(): GetPaginatedDTO
     {
         return new GetPaginatedDTO(
-            take: $this->input('Take', 10),
-            skip: $this->input('Skip', 0),
-            searchValue: $this->input('SearchValue')
+            Take: $this->input('Take', 10),
+            Skip: $this->input('Skip', 0),
+            SearchValue: $this->input('SearchValue')
         );
     }
 }
