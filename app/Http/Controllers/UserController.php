@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Requests\GetPaginatedRequest;
 use Illuminate\Http\Request;
-use App\Services\UserService;
 use App\Response\ResponseHelper;
+use App\Services\UserService\UserService;
 
 class UserController extends Controller
 {
@@ -42,13 +42,9 @@ class UserController extends Controller
 
     public function GetAllUserPaginated(GetPaginatedRequest $request)
     {
-        try {
-            $dto = $request->toDTO();
-            $status = $this->userService->GetAllUsersPaginated($dto);
-            return ResponseHelper::getStatusResponse($status);
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
+        $dto = $request->toDTO();
+        $status = $this->userService->GetAllUsersPaginated($dto);
+        return ResponseHelper::getStatusResponse($status);
     }
 
     public function ToggleUserStatus($id)

@@ -66,6 +66,11 @@ class Token
     {
         $request = request();
         $refToken = $request->cookie('refreshToken') ?? $request->input('refreshToken');
-        return static::validateRefreshToken($refToken);
+        $payload = static::validateRefreshToken($refToken);
+
+        if (!$payload) {
+            return null;
+        }
+        return $payload->sub;
     }
 }

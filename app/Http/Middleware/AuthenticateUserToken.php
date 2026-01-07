@@ -16,9 +16,9 @@ class AuthenticateUserToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Token::getUserId();
+        $userId = Token::getUserId();
 
-        if (!$user || !isset($user->sub)) {
+        if (!$userId || !isset($userId)) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);

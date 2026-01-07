@@ -22,10 +22,10 @@ class UserAccessHelper
             ];
 
             return $default_access;
-        } else if ($roleEnum === UserRoles::USERS) {
+        } else if ($roleEnum === UserRoles::STUDENTS) {
             return [
-                UserAccess::DASHBOARD->value,
-
+                UserAccess::STUDENT_DASHBOARD->value,
+                UserAccess::APPOINTMENTS->value,
             ];
         }
 

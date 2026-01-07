@@ -9,32 +9,32 @@ class ResponseHelper
     public static function successResponse($statusCode = 200, $message = 'Success')
     {
         return [
-            'status_code' => $statusCode,
-            'message' => $message,
+            'StatusCode' => $statusCode,
+            'Message' => $message,
         ];
     }
 
     public static function errorResponse($statusCode = 400, $message = "error")
     {
         return [
-            'status_code' => $statusCode,
-            'message' => $message
+            'StatusCode' => $statusCode,
+            'Message' => $message
         ];
     }
 
     public static function successWData($statusCode = 200, $message = 'Success', $data)
     {
         return [
-            'status_code' => $statusCode,
-            'message' => $message,
-            'data' => $data
+            'StatusCode' => $statusCode,
+            'Message' => $message,
+            'Data' => $data
         ];
     }
 
     public static function getStatusResponse(array $response): JsonResponse
     {
-        $statusCode = $response['status_code'] ?? 400;
-        $data = $response['data'] ?? null;
+        $statusCode = $response['StatusCode'] ?? 400;
+        $data = $response['Data'] ?? null;
 
         return match ($statusCode) {
             200 => response()->json($response, 200),

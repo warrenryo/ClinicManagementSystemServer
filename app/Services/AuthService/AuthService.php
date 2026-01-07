@@ -2,6 +2,9 @@
 
 namespace App\Services\AuthService;
 
+use App\Enums\Course;
+use App\Enums\UserRoles;
+use App\Enums\YearLevel;
 use App\Helpers\Token;
 use App\Helpers\UserAccessHelper;
 use App\Models\Auth\User;
@@ -43,43 +46,44 @@ class AuthService implements IAuthService
 
     public function Register(Request $request)
     {
-        $existed_user = User::where('email', $request['email'])->first();
+        $existed_user = User::where('email', $request['Email'])->first();
 
 
         if ($existed_user) return ResponseHelper::errorResponse(400, 'Email Already Exist');
 
         DB::beginTransaction();
         try {
-            $user = User::create([
-                'email' => $request['email'],
-                'role' => $request['system_role'],
-                'password' => bcrypt($request['password']),
-                'user_access' => UserAccessHelper::UserDefaultAccess($request['system_role'])
-            ]);
-
-            $user_details_data = [
-                'first_name' => $request['firstname'],
-                'last_name' => $request['lastname'],
-                'phone' => $request['phone'],
-                'address' => $request['address'],
-                'city' => $request['city'],
-                'postal_code' => $request['postal_code'],
-                'profile_img' => $request['profile_img']
-            ];
-
-            $user_details = $user->UserDetails()->create($user_details_data);
-
-            if (!empty($request['churches'] && is_array($request['churches']))) {
-                foreach ($request['churches'] as $church) {
-                    $addChurch = [
-                        'user_details_id' => $user_details->id,
-                        'church_id' => $church['church_id']
-                    ];
-
-                    $user_details->UserChurches()->create($addChurch);
-                }
+            $password = $request['Password'];
+            if (empty($password)) {
+                $lastname = strtolower($request['LastName'] ?? 'user');
+                $password = $lastname . date('Y'); // e.g., SMITH2025
             }
 
+
+            $user = User::create([
+                'email' => $request['Email'],
+                'role' => $request['SystemRole'],
+                'password' => bcrypt($password),
+                'user_access' => UserAccessHelper::UserDefaultAccess($request['SystemRole'])
+            ]);
+
+            $userDetails = $user->userDetails()->create([
+                'first_name' => $request['FirstName'],
+                'last_name' => $request['LastName'],
+                'phone' => $request['Phone'],
+                'address' => $request['Address'],
+                'city' => $request['City'],
+                'postal_code' => $request['PostalCode'],
+                'profile_img' => $request['ProfileImg'] ?? null,
+            ]);
+
+            if ($request['SystemRole'] === UserRoles::STUDENTS->value) {
+                $userDetails->studentDetails()->create([
+                    'student_number' => $request['StudentNumber'],
+                    'course' => Course::from($request['Course'])->value,
+                    'year_level' => YearLevel::from($request['YearLevel'])->value,
+                ]);
+            }
 
             DB::commit();
 
@@ -97,7 +101,7 @@ class AuthService implements IAuthService
             return ResponseHelper::errorResponse(404, 'Unauthorized');
         }
 
-        $user = User::where('id', $userId->sub)->first();
+        $user = User::where('id', $userId)->first();
         if (!$user) {
             return ResponseHelper::errorResponse(400, 'Invalid Credentials');
         }

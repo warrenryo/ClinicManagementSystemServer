@@ -19,11 +19,11 @@ class AuthController extends Controller
     public function Login(Request $request)
     {
         $status = $this->authService->Login($request);
-        if ($status['status_code'] >= 400) {
+        if ($status['StatusCode'] >= 400) {
             return ResponseHelper::getStatusResponse($status);
         }
 
-        $store_cookie = Cookie::make('refreshToken', $status['data']['refresh_token'], 10080, null, null, true, true, false, 'None');
+        $store_cookie = Cookie::make('refreshToken', $status['Data']['refresh_token'], 10080, null, null, true, true, false, 'None');
 
         return response()->json($status)->cookie($store_cookie);
     }
@@ -37,11 +37,11 @@ class AuthController extends Controller
     public function RefreshToken(Request $request)
     {
         $status = $this->authService->RefreshToken($request);
-        if ($status['status_code'] >= 400) {
+        if ($status['StatusCode'] >= 400) {
             return ResponseHelper::getStatusResponse($status);
         }
 
-        $store_cookie = Cookie::make('refreshToken', $status['data']['refresh_token'], 10080, null, null, true, true, false, 'None');
+        $store_cookie = Cookie::make('refreshToken', $status['Data']['refresh_token'], 10080, null, null, true, true, false, 'None');
 
         return response()->json($status)->cookie($store_cookie);
     }
