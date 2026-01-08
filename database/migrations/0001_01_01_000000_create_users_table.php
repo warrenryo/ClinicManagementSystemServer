@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('role');
             $table->json('user_access')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->text('access_token')->default('');
-            $table->text('refresh_token')->default('');
+            $table->text('access_token')->nullable();
+            $table->text('refresh_token')->nullable();
             $table->timestamp('refresh_token_createdAt')->nullable();
             $table->timestamp('refresh_token_expiresAt')->nullable();
             $table->timestamps();
