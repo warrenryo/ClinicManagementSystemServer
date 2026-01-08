@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticateUserToken;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -10,12 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
-        then: function () {
-            app()->router->aliasMiddleware('authenticate.user.token', \App\Http\Middleware\AuthenticateUserToken::class);
-        }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'authenticate.user.token' => AuthenticateUserToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
