@@ -12,4 +12,8 @@ enum UserAccess: int
         //for students
     case STUDENT_DASHBOARD = 2;
     case APPOINTMENTS = 3;
+
+
+
+    case OVERALL_APPOINTMENTS = 4;
 }

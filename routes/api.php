@@ -58,6 +58,13 @@ Route::middleware(['authenticate.user.token'])->group(function () {
         Route::controller(AppointmentController::class)->group(function () {
             Route::post('create-appointment', 'CreateAppointment');
             Route::get('get-appointment-dates', 'GetAppointmentDates');
+            Route::get('get-user-appointments', 'GetUserAppointments');
+            Route::get('get-user-appointment-details/{appointmentId}', 'GetUserAppointmentDetails');
+            Route::get('get-overall-appointments', 'GetOverallAppointments');
+            Route::get('get-appointments-by-date/{date}', 'GetAppointmentsByDate');
+            Route::get('get-appointment-calendar-counts/{month}/{year}', 'GetAppointmentCalendarCounts');
+            Route::put('set-appointment-status/{appointmentId}/{status}', 'SetAppointmentStatus');
+            Route::put('reschedule-appointment/{appointmentId}', 'RescheduleAppointment');
         });
     });
 });
