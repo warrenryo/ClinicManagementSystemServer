@@ -44,10 +44,10 @@ class AppointmentService implements IAppointmentService
                 // Check if user already has an appointment
                 $userAppointment = Appointment::where('user_details_id', $userDetailsId)
                     ->where('appointment_date', $appointmentDate)
-                    ->where('appointment_time', $validatedData['Time'])
+                    ->where('status', '!=', AppointmentStatus::CANCELLED->value)
                     ->first();
 
-                if ($userAppointment && $userAppointment->status !== AppointmentStatus::CANCELLED->value) {
+                if ($userAppointment) {
                     return ResponseHelper::errorResponse(
                         409,
                         'You already have an appointment booked for this date and time.'
