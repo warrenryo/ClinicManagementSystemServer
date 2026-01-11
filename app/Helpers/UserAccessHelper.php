@@ -18,7 +18,8 @@ class UserAccessHelper
         if ($roleEnum === UserRoles::SUPERUSER) {
             $default_access = [
                 UserAccess::DASHBOARD->value,
-
+                UserAccess::USERS->value,
+                UserAccess::OVERALL_APPOINTMENTS->value,
             ];
 
             return $default_access;
