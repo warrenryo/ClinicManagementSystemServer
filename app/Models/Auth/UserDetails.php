@@ -2,6 +2,7 @@
 
 namespace App\Models\Auth;
 
+use App\Models\Medical\MedicalRecords;
 use App\Models\Students\StudentDetails;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,5 +29,15 @@ class UserDetails extends Model
     public function studentDetails()
     {
         return $this->hasOne(StudentDetails::class, 'user_details_id', 'id');
+    }
+
+    public function doctorDetails()
+    {
+        return $this->hasOne(DoctorDetails::class, 'user_details_id', 'id');
+    }
+
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecords::class, 'user_details_id', 'id');
     }
 }

@@ -85,6 +85,13 @@ class AuthService implements IAuthService
                 ]);
             }
 
+            if ($request['SystemRole'] === UserRoles::DOCTORS->value) {
+                $userDetails->doctorDetails()->create([
+                    'specialization' => $request['Specialization'],
+                    'license_number' => $request['LicenseNumber'],
+                ]);
+            }
+
             DB::commit();
 
             return ResponseHelper::successResponse();

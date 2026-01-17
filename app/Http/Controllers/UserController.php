@@ -70,4 +70,11 @@ class UserController extends Controller
             ], 400);
         }
     }
+
+    public function GetAllDoctorsPaginated(GetPaginatedRequest $request)
+    {
+        $dto = $request->toDTO();
+        $status = $this->userService->GetAllDoctorsPaginated($dto);
+        return ResponseHelper::getStatusResponse($status);
+    }
 }

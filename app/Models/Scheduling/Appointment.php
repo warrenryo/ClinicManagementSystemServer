@@ -2,17 +2,18 @@
 
 namespace App\Models\Scheduling;
 
+use App\Helpers\SearchableTrait;
 use App\Models\Auth\UserDetails;
+use App\Models\Medical\MedicalRecords;
 use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    //
+    use SearchableTrait;
     protected $table = 'appointment';
 
     protected $fillable = [
         'user_details_id',
-        'assigned_doctor_id',
         'appointment_date',
         'appointment_time',
         'reason',
@@ -33,8 +34,13 @@ class Appointment extends Model
         return $this->belongsTo(UserDetails::class, 'user_details_id');
     }
 
-    public function assignedDoctor()
+    public function appointmentDoctors()
     {
-        return $this->belongsTo(UserDetails::class, 'assigned_doctor_id');
+        return $this->hasMany(AppointmentDoctors::class, 'appointment_id', 'id');
+    }
+
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecords::class, 'appointment_id', 'id');
     }
 }

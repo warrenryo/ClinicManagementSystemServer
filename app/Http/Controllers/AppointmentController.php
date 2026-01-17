@@ -70,4 +70,10 @@ class AppointmentController extends Controller
         $response = $this->appointmentService->RescheduleAppointment($request, $appointmentId);
         return ResponseHelper::getStatusResponse($response);
     }
+
+    public function AssignDoctorToAppointment(Request $request)
+    {
+        $response = $this->appointmentService->AssignDoctorToAppointment($request);
+        return ResponseHelper::getStatusResponse($response);
+    }
 }

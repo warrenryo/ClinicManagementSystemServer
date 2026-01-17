@@ -16,4 +16,5 @@ interface IAppointmentService
     public function GetAppointmentCalendarCounts($month, $year);
     public function SetAppointmentStatus($appointmentId, $status);
     public function RescheduleAppointment(Request $request, $appointmentId);
+    public function AssignDoctorToAppointment(Request $request);
 }
