@@ -5,7 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AzureBlobStorageController;
+use App\Http\Controllers\DoctorAppointmentController;
 use App\Http\Controllers\LocalUploadController;
+use App\Http\Controllers\MedicalRecordsController;
 use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
@@ -51,6 +53,7 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::get('get-all-users-paginated', 'GetAllUserPaginated');
             Route::put('toggle-user-status/{id}', 'ToggleUserStatus');
             Route::get('get-all-users-list', 'GetAllUsersList');
+            Route::get('get-all-doctors-paginated', 'GetAllDoctorsPaginated');
         });
     });
 
@@ -65,6 +68,22 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::get('get-appointment-calendar-counts/{month}/{year}', 'GetAppointmentCalendarCounts');
             Route::put('set-appointment-status/{appointmentId}/{status}', 'SetAppointmentStatus');
             Route::put('reschedule-appointment/{appointmentId}', 'RescheduleAppointment');
+            Route::put('assign-doctor-to-appointment', 'AssignDoctorToAppointment');
+        });
+    });
+
+    Route::group(['prefix' => 'doctorappointment'], function () {
+        Route::controller(DoctorAppointmentController::class)->group(function () {
+            Route::get('get-doctor-appointment-paginated', 'GetDoctorAppointmentPaginated');
+            Route::put('reassign-doctor', 'ReassignDoctor');
+            Route::post('add-vital-sign/{appointmentId}', 'AddVitalSign');
+        });
+    });
+
+    Route::group(['prefix' => 'medicalrecords'], function () {
+        Route::controller(MedicalRecordsController::class)->group(function () {
+            Route::post('add-vital-sign/{appointmentId}', 'AddVitalSign');
+            Route::get('get-initial-records/{appointmentId}', 'GetAppointmentMedical');
         });
     });
 });

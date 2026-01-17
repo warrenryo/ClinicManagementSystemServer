@@ -16,4 +16,12 @@ enum UserAccess: int
 
 
     case OVERALL_APPOINTMENTS = 4;
+
+    case DOCTOR_DASHBOARD = 5;
+    case DOCTOR_APPOINTMENTS = 6;
+
+    case ADD_VITAL_SIGN = 7;
+    case TODAYS_APPOINTMENT = 8;
+
+    case STAFF_DASHBOARD = 9;
 }

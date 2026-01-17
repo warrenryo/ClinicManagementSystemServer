@@ -20,6 +20,8 @@ class UserAccessHelper
                 UserAccess::DASHBOARD->value,
                 UserAccess::USERS->value,
                 UserAccess::OVERALL_APPOINTMENTS->value,
+                UserAccess::TODAYS_APPOINTMENT->value,
+                UserAccess::ADD_VITAL_SIGN,
             ];
 
             return $default_access;
@@ -27,6 +29,18 @@ class UserAccessHelper
             return [
                 UserAccess::STUDENT_DASHBOARD->value,
                 UserAccess::APPOINTMENTS->value,
+            ];
+        } else if ($roleEnum === UserRoles::DOCTORS) {
+            return [
+                UserAccess::DOCTOR_DASHBOARD->value,
+                UserAccess::DOCTOR_APPOINTMENTS->value,
+            ];
+        } else if ($roleEnum === UserRoles::STAFF) {
+            return [
+                UserAccess::STAFF_DASHBOARD->value,
+                UserAccess::OVERALL_APPOINTMENTS->value,
+                UserAccess::TODAYS_APPOINTMENT->value,
+                UserAccess::ADD_VITAL_SIGN,
             ];
         }
 

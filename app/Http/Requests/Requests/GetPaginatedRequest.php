@@ -35,7 +35,8 @@ class GetPaginatedRequest extends FormRequest
         return new GetPaginatedDTO(
             Take: $this->input('Take', 10),
             Skip: $this->input('Skip', 0),
-            SearchValue: $this->input('SearchValue')
+            SearchValue: $this->input('SearchValue'),
+            Date: $this->input('Date')
         );
     }
 }

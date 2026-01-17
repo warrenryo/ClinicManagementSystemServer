@@ -4,7 +4,10 @@ namespace App\Services\UserService;
 
 use App\DTO\Response\GetPaginatedDTO;
 use App\DTO\Response\PaginatedTableResponse;
+use App\Enums\DoctorSpecialization;
+use App\Enums\UserRoles;
 use App\Helpers\Token;
+use App\Models\Auth\DoctorDetails;
 use App\Models\Auth\User;
 use App\Models\Auth\UserDetails;
 use Illuminate\Http\Request;
@@ -97,8 +100,9 @@ class UserService implements IUserService
             $query = User::query()
                 ->search(
                     $request->SearchValue,
-                    ['email'], // columns on User
-                    ['UserDetails' => ['first_name', 'last_name']] // relation columns
+                    ['email', 'role'],
+                    ['userDetails' => ['first_name', 'last_name']],
+                    ['' => ['role' => UserRoles::class]]
                 );
 
             // if (!empty($request->searchValue)) {
@@ -172,6 +176,49 @@ class UserService implements IUserService
             });
 
             return ResponseHelper::successWData(200, "Success", $result);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
+        }
+    }
+
+    public function GetAllDoctorsPaginated(GetPaginatedDTO $request)
+    {
+        try {
+            $query = DoctorDetails::query()
+                ->search(
+                    $request->SearchValue,
+                    ['license_number', 'specialization'],
+                    ['userDetails' => ['first_name', 'last_name']],
+                    [
+                        '' => [
+                            'specialization' => DoctorSpecialization::class
+                        ]
+                    ],
+                );
+
+            $count = $query->count();
+
+            $doctors = $query
+                ->orderBy('created_at', 'desc')
+                ->skip($request->Skip)
+                ->take($request->Take)
+                ->get();
+
+            $result_data = $doctors->map(function ($doctor) {
+                return [
+                    'Id' => $doctor->id,
+                    'FullName' => $doctor->userDetails->first_name . ' ' . $doctor->userDetails->last_name,
+                    'Specialization' => $doctor->specialization,
+                    'ImageUrl' => !empty($doctor->userDetails->profile_img)
+                        ? $doctor->userDetails->profile_img
+                        : null,
+                    'LicenseNumber' => $doctor->license_number,
+                ];
+            })->toArray();
+
+            $paginated_response = new PaginatedTableResponse($result_data, $count);
+
+            return ResponseHelper::successWData(200, "Success", $paginated_response);
         } catch (\Throwable $th) {
             return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
         }

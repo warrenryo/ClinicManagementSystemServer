@@ -11,4 +11,5 @@ interface IUserService
     public function GetAllUsersPaginated(GetPaginatedDTO $request);
     public function ToggleUserStatus($userId);
     public function GetAllUsersList();
+    public function GetAllDoctorsPaginated(GetPaginatedDTO $request);
 }

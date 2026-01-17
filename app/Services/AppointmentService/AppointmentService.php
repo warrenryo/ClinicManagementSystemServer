@@ -6,8 +6,10 @@ use App\DTO\Response\GetPaginatedDTO;
 use App\DTO\Response\PaginatedTableResponse;
 use App\Enums\AppointmentStatus;
 use App\Enums\AppointmentType;
+use App\Enums\ApprovalStatus;
 use App\Helpers\Token;
 use App\Helpers\UserHelper;
+use App\Models\Auth\DoctorDetails;
 use App\Models\Scheduling\Appointment;
 use App\Response\ResponseHelper;
 use Carbon\Carbon;
@@ -200,11 +202,25 @@ class AppointmentService implements IAppointmentService
                 ->get();
 
             $result_data = $appointments->map(function ($appointment) {
+
+                $latestDoctor = $appointment->appointmentDoctors
+                    ->sortByDesc('created_at')
+                    ->first();
+
+                $doctorDetails = $latestDoctor?->doctorDetails;
+
                 return [
                     'Id' => $appointment->id,
                     'FullName' => $appointment->userDetails->first_name . ' ' . $appointment->userDetails->last_name,
                     'AppointmentDate' => $appointment->appointment_date->toDateString(),
                     'AppointmentTime' => $appointment->appointment_time,
+                    'Doctor' => $doctorDetails ? [
+                        'Id' => $doctorDetails->id,
+                        'DoctorId' => $latestDoctor->doctor_id,
+                        'FullName' => $doctorDetails->userDetails->first_name . ' ' .  $doctorDetails->userDetails->last_name,
+                        'Status' => $latestDoctor->status,
+                        'Reason' => $latestDoctor->reassign_reason,
+                    ] : null,
                     'Status' => AppointmentStatus::from($appointment->status)->value,
                     'Type' => AppointmentType::from($appointment->type)->value,
                 ];
@@ -338,6 +354,45 @@ class AppointmentService implements IAppointmentService
                 );
             }
             return ResponseHelper::errorResponse(500, 'Database error occurred');
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, $th->getMessage());
+        }
+    }
+
+    public function AssignDoctorToAppointment(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'AppointmentId' => 'required|integer|exists:appointment,id',
+                'DoctorId' => 'required|integer|exists:doctor_details,id',
+            ]);
+
+            $appointment = Appointment::findOrFail($validatedData['AppointmentId']);
+
+            // $alreadyAssigned = $appointment->appointmentDoctors()
+            //     ->where('doctor_id', $validatedData['DoctorId'])
+            //     ->exists();
+
+            // if ($alreadyAssigned) {
+            //     return ResponseHelper::errorResponse(
+            //         409,
+            //         "Doctor already assigned to this appointment"
+            //     );
+            // }
+
+            $appointment->appointmentDoctors()->create([
+                'doctor_id' => $validatedData['DoctorId'],
+                'status' => ApprovalStatus::APPROVED->value,
+            ]);
+
+            $appointment->update([
+                'status' => AppointmentStatus::APPROVED->value
+            ]);
+
+            return ResponseHelper::successResponse(
+                200,
+                "Doctor assigned to appointment successfully"
+            );
         } catch (\Throwable $th) {
             return ResponseHelper::errorResponse(500, $th->getMessage());
         }

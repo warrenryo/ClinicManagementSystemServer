@@ -9,8 +9,12 @@ use Illuminate\Contracts\Foundation\Application;
 use App\Services\AuthService\IAuthService;
 use App\Services\AzureBlobStorageService\AzureBlobStorageService;
 use App\Services\AzureBlobStorageService\IAzureBlobStoragInterface;
+use App\Services\DoctorAppointmentService\DoctorAppointmentService;
+use App\Services\DoctorAppointmentService\IDoctorAppointmentService;
 use App\Services\LocalUploadService\ILocalUploadService;
 use App\Services\LocalUploadService\LocalUploadService;
+use App\Services\MedicalRecordService\IMedicalRecordService;
+use App\Services\MedicalRecordService\MedicalRecordService;
 use App\Services\UserService\IUserService;
 use App\Services\UserService\UserService;
 
@@ -23,5 +27,7 @@ class DependencyInjection
         $app->bind(IAzureBlobStoragInterface::class, AzureBlobStorageService::class);
         $app->bind(ILocalUploadService::class, LocalUploadService::class);
         $app->bind(IAppointmentService::class, AppointmentService::class);
+        $app->bind(IDoctorAppointmentService::class, DoctorAppointmentService::class);
+        $app->bind(IMedicalRecordService::class, MedicalRecordService::class);
     }
 }
