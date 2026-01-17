@@ -33,6 +33,7 @@ class AuthService implements IAuthService
             $user->save();
 
             $result = [
+                'full_name' => $user->userDetails->first_name . ' ' . $user->userDetails->last_name,
                 'access_token' => $accessToken,
                 'refresh_token' => $refresh['token'],
                 'user_access' => $user->user_access
@@ -131,6 +132,7 @@ class AuthService implements IAuthService
         $user->save();
 
         $result = [
+            'full_name' => $user->userDetails->first_name . ' ' . $user->userDetails->last_name,
             'access_token' => $accessToken,
             'refresh_token' => $refresh['token'],
             'user_access' => $user->user_access
