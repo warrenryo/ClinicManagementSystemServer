@@ -19,6 +19,8 @@ class MedicalRecords extends Model
         'symptoms',
         'action_taken',
         'remarks',
+        'findings',
+        'is_done'
     ];
 
     protected $casts = [

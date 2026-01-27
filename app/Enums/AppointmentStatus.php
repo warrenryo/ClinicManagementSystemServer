@@ -11,4 +11,5 @@ enum AppointmentStatus: int
     case COMPLETED = 4;
     case NO_SHOW = 5;
     case REASSIGN = 6;
+    case CHECKUP_DONE = 7;
 }

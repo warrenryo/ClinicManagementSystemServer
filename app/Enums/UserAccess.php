@@ -24,4 +24,7 @@ enum UserAccess: int
     case TODAYS_APPOINTMENT = 8;
 
     case STAFF_DASHBOARD = 9;
+
+    case ALL_PRODUCTS = 10;
+    case MODIFY_PRODUCTS = 11;
 }

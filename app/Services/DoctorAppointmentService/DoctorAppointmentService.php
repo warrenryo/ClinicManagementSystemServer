@@ -32,6 +32,7 @@ class DoctorAppointmentService implements IDoctorAppointmentService
             $userDetailsId = UserHelper::getUserDetailsId();
             $doctor = DoctorDetails::where('user_details_id', $userDetailsId)->first();
             $query = Appointment::query()
+                ->where('status', '!=', AppointmentStatus::CHECKUP_DONE->value)
                 ->search(
                     $request->SearchValue,
                     ['reason'],

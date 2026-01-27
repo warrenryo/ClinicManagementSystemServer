@@ -26,7 +26,8 @@ class GetPaginatedRequest extends FormRequest
         return [
             'Take' => 'integer|min:1|max:500',
             'Skip' => 'integer',
-            'SearchValue' => 'nullable|string|max:255'
+            'SearchValue' => 'nullable|string|max:255',
+            'ApprovalStatus' => 'integer'
         ];
     }
 
@@ -36,7 +37,8 @@ class GetPaginatedRequest extends FormRequest
             Take: $this->input('Take', 10),
             Skip: $this->input('Skip', 0),
             SearchValue: $this->input('SearchValue'),
-            Date: $this->input('Date')
+            Date: $this->input('Date'),
+            ApprovalStatus: $this->input('ApprovalStatus')
         );
     }
 }

@@ -41,6 +41,6 @@ class Appointment extends Model
 
     public function medicalRecords()
     {
-        return $this->hasMany(MedicalRecords::class, 'appointment_id', 'id');
+        return $this->hasOne(MedicalRecords::class, 'appointment_id', 'id');
     }
 }

@@ -15,6 +15,8 @@ use App\Services\LocalUploadService\ILocalUploadService;
 use App\Services\LocalUploadService\LocalUploadService;
 use App\Services\MedicalRecordService\IMedicalRecordService;
 use App\Services\MedicalRecordService\MedicalRecordService;
+use App\Services\ProductService\IProductService;
+use App\Services\ProductService\ProductService;
 use App\Services\UserService\IUserService;
 use App\Services\UserService\UserService;
 
@@ -29,5 +31,6 @@ class DependencyInjection
         $app->bind(IAppointmentService::class, AppointmentService::class);
         $app->bind(IDoctorAppointmentService::class, DoctorAppointmentService::class);
         $app->bind(IMedicalRecordService::class, MedicalRecordService::class);
+        $app->bind(IProductService::class, ProductService::class);
     }
 }
