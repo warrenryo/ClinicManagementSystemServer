@@ -34,7 +34,6 @@ class ProductService implements IProductService
                 'Description' => 'nullable|string',
                 'UOM' => 'required|integer',
                 'ReflenishAmount' => 'required|numeric',
-                'AtCost' => 'required|numeric'
             ]);
 
             Products::create([
@@ -42,7 +41,7 @@ class ProductService implements IProductService
                 'description' => $validatedData['Description'],
                 'uom' => UOM::from($validatedData['UOM'])->value,
                 'reflenish_amount' => $validatedData['ReflenishAmount'],
-                'at_cost' => $validatedData['AtCost']
+                'at_cost' => 0
             ]);
 
             return ResponseHelper::successResponse(200, "Success");
@@ -79,7 +78,6 @@ class ProductService implements IProductService
                 'Description' => 'nullable|string',
                 'UOM' => 'required|integer',
                 'ReflenishAmount' => 'required|numeric',
-                'AtCost' => 'required|numeric'
             ]);
 
             $product = Products::findOrFail($productId);
@@ -89,7 +87,7 @@ class ProductService implements IProductService
                 'description' => $validatedData['Description'],
                 'uom' => $validatedData['UOM'],
                 'reflenish_amount' => $validatedData['ReflenishAmount'],
-                'at_cost' => $validatedData['AtCost']
+                'at_cost' => 0
             ]);
 
             return ResponseHelper::successResponse(200, "Success");
