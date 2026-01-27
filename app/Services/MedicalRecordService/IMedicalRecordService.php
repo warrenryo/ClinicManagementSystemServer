@@ -8,4 +8,5 @@ interface IMedicalRecordService
 {
     public function AddVitalSign(Request $request, int $appointmentId);
     public function GetAppointmentMedical($appointmentId);
+    public function CreateMedicalRecord(Request $request);
 }

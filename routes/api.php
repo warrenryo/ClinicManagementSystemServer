@@ -8,6 +8,7 @@ use App\Http\Controllers\AzureBlobStorageController;
 use App\Http\Controllers\DoctorAppointmentController;
 use App\Http\Controllers\LocalUploadController;
 use App\Http\Controllers\MedicalRecordsController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
@@ -84,6 +85,19 @@ Route::middleware(['authenticate.user.token'])->group(function () {
         Route::controller(MedicalRecordsController::class)->group(function () {
             Route::post('add-vital-sign/{appointmentId}', 'AddVitalSign');
             Route::get('get-initial-records/{appointmentId}', 'GetAppointmentMedical');
+            Route::post('create-medical-records', 'CreateMedicalRecord');
+        });
+    });
+
+    Route::group(['prefix' => 'products'], function () {
+        Route::controller(ProductController::class)->group(function () {
+            Route::post('create-product', 'CreateProduct');
+            Route::get('get-single-product/{productId}', 'GetSingleProduct');
+            Route::put('update-product/{productId}', 'UpdateProduct');
+            Route::get('get-product-paginated', 'GetProductPaginated');
+            Route::post('request-stocks', 'RequestStocks');
+            Route::get('get-request-stocks-paginated', 'GetRequestStocksPaginated');
+            Route::get('get-single-po/{poId}', 'ViewSinglePO');
         });
     });
 });

@@ -25,4 +25,10 @@ class MedicalRecordsController extends Controller
         $response = $this->medicalRecordService->GetAppointmentMedical($appointmentId);
         return ResponseHelper::getStatusResponse($response);
     }
+
+    public function CreateMedicalRecord(Request $request)
+    {
+        $response = $this->medicalRecordService->CreateMedicalRecord($request);
+        return ResponseHelper::getStatusResponse($response);
+    }
 }

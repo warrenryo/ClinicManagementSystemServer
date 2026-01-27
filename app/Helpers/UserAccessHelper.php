@@ -21,7 +21,9 @@ class UserAccessHelper
                 UserAccess::USERS->value,
                 UserAccess::OVERALL_APPOINTMENTS->value,
                 UserAccess::TODAYS_APPOINTMENT->value,
-                UserAccess::ADD_VITAL_SIGN,
+                UserAccess::ADD_VITAL_SIGN->value,
+                UserAccess::ALL_PRODUCTS->value,
+                UserAccess::MODIFY_PRODUCTS->value,
             ];
 
             return $default_access;
@@ -40,7 +42,7 @@ class UserAccessHelper
                 UserAccess::STAFF_DASHBOARD->value,
                 UserAccess::OVERALL_APPOINTMENTS->value,
                 UserAccess::TODAYS_APPOINTMENT->value,
-                UserAccess::ADD_VITAL_SIGN,
+                UserAccess::ADD_VITAL_SIGN->value,
             ];
         }
 
