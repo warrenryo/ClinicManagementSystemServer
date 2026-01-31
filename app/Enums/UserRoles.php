@@ -12,4 +12,5 @@ enum UserRoles: int
     case DOCTORS = 2;
     case STAFF = 3;
     case TEACHERS = 4;
+    case PROCUREMENT = 5;
 }

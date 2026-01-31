@@ -14,4 +14,6 @@ interface IProductService
     public function RequestStocks(Request $request);
     public function GetRequestStocksPaginated(GetPaginatedDTO $request);
     public function ViewSinglePO($poId);
+    public function ApproveRejectRequestStock(Request $request, $poId);
+    public function ReceiveDelivery($poId);
 }

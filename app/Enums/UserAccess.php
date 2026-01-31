@@ -27,4 +27,5 @@ enum UserAccess: int
 
     case ALL_PRODUCTS = 10;
     case MODIFY_PRODUCTS = 11;
+    case PROCUREMENT_APPROVAL = 12;
 }

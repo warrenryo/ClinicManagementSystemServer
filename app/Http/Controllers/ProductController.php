@@ -58,4 +58,16 @@ class ProductController extends Controller
         $response = $this->productService->ViewSinglePO($poId);
         return ResponseHelper::getStatusResponse($response);
     }
+
+    public function ApproveRejectRequestStock(Request $request, $poId)
+    {
+        $response = $this->productService->ApproveRejectRequestStock($request, $poId);
+        return ResponseHelper::getStatusResponse($response);
+    }
+
+    public function ReceiveDelivery($poId)
+    {
+        $response = $this->productService->ReceiveDelivery($poId);
+        return ResponseHelper::getStatusResponse($response);
+    }
 }

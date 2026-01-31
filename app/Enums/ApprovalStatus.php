@@ -8,4 +8,5 @@ enum ApprovalStatus: int
     case APPROVED = 1;
     case REJECTED = 2;
     case REASSIGN = 3;
+    case RECEIVED = 4;
 }

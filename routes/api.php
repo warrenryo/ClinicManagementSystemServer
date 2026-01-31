@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AzureBlobStorageController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorAppointmentController;
 use App\Http\Controllers\LocalUploadController;
 use App\Http\Controllers\MedicalRecordsController;
@@ -98,6 +99,21 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::post('request-stocks', 'RequestStocks');
             Route::get('get-request-stocks-paginated', 'GetRequestStocksPaginated');
             Route::get('get-single-po/{poId}', 'ViewSinglePO');
+            Route::put('update-stock-request/{poId}', 'ApproveRejectRequestStock');
+            Route::put('receive-delivery/{poId}', 'ReceiveDelivery');
+        });
+    });
+
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::controller(DashboardController::class)->group(function () {
+            Route::get('get-dashboard-card', 'DashCards');
+            Route::get('get-appointment-analytics', 'GetAppointmentAnalytics');
+            Route::get('get-inventory-cost-analytics', 'GetPurchaseOrderAtCostChart');
+            Route::get('get-appointment-analytics', 'GetAppointmentCharData');
+            Route::post('generate-summary', 'generateClinicSummary');
+            Route::get('get-latest-summary', 'GetLatestAISummary');
+            Route::get('get-appointment-reason-distribution', 'GetAppointmentReasonDistribution');
+            Route::get('get-appointment-reason-trend', 'GetAppointmentReasonTrend');
         });
     });
 });

@@ -9,12 +9,18 @@ use Illuminate\Contracts\Foundation\Application;
 use App\Services\AuthService\IAuthService;
 use App\Services\AzureBlobStorageService\AzureBlobStorageService;
 use App\Services\AzureBlobStorageService\IAzureBlobStoragInterface;
+use App\Services\DashboardService\DashboardService;
+use App\Services\DashboardService\IDashboardService;
 use App\Services\DoctorAppointmentService\DoctorAppointmentService;
 use App\Services\DoctorAppointmentService\IDoctorAppointmentService;
+use App\Services\GeminiService\GeminiService;
+use App\Services\GeminiService\IGeminiService;
 use App\Services\LocalUploadService\ILocalUploadService;
 use App\Services\LocalUploadService\LocalUploadService;
 use App\Services\MedicalRecordService\IMedicalRecordService;
 use App\Services\MedicalRecordService\MedicalRecordService;
+use App\Services\ProcurementService\IProcurementService;
+use App\Services\ProcurementService\ProcurementService;
 use App\Services\ProductService\IProductService;
 use App\Services\ProductService\ProductService;
 use App\Services\UserService\IUserService;
@@ -32,5 +38,7 @@ class DependencyInjection
         $app->bind(IDoctorAppointmentService::class, DoctorAppointmentService::class);
         $app->bind(IMedicalRecordService::class, MedicalRecordService::class);
         $app->bind(IProductService::class, ProductService::class);
+        $app->bind(IDashboardService::class, DashboardService::class);
+        $app->bind(IGeminiService::class, GeminiService::class);
     }
 }
