@@ -122,6 +122,7 @@ class ProductService implements IProductService
                     'Title' => $prod->title,
                     'UOM' => $prod->uom,
                     'Quantity' => $prod->quantity,
+                    'PackagingQty' => (int) $prod->reflenish_amount
                 ];
             })->toArray();
 
@@ -158,6 +159,7 @@ class ProductService implements IProductService
                             'purchase_order_id' => $purchase_order->id,
                             'product_id' => $product['ProductId'],
                             'quantity' => $product['Quantity'],
+                            'at_cost' => 0
                         ]);
                     }
                 }
@@ -172,8 +174,14 @@ class ProductService implements IProductService
     public function GetRequestStocksPaginated(GetPaginatedDTO $request)
     {
         try {
-            $query = PurchaseOrder::query()
-                ->where('approval_status', ApprovalStatus::from($request->ApprovalStatus)->value);
+            $query = PurchaseOrder::query();
+
+            if (!empty($request->ApprovalStatus)) {
+                $query->where(
+                    'approval_status',
+                    ApprovalStatus::from($request->ApprovalStatus)->value
+                );
+            }
 
             $count = $query->count();
 
@@ -207,6 +215,8 @@ class ProductService implements IProductService
 
             $data = [
                 'Notes' => $po->notes,
+                'ApprovalStatus' => $po->approval_status,
+                'RejectReason' => $po->reject_reason,
                 'SelectedProducts' => $po->purchaseOrderItems->map(function ($item) {
                     return [
                         'ProductId' => $item->id,
@@ -214,12 +224,99 @@ class ProductService implements IProductService
                         'UOM' => UOM::from($item->products->uom)->value,
                         'PkgQty' => (int)$item->products->reflenish_amount,
                         'Quantity' => $item->quantity,
-                        'Receive' => $item->quantity * $item->products->reflenish_amount
+                        'Receive' => $item->quantity * $item->products->reflenish_amount,
+                        'AtCostPrice' => $item->at_cost ?? null,
                     ];
                 })
             ];
 
             return ResponseHelper::successWData(200, "Success", $data);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
+        }
+    }
+
+    public function ApproveRejectRequestStock(Request $request, $poId)
+    {
+        try {
+            $validatedData = $request->validate([
+                'Notes'          => 'nullable|string',
+                'ApprovalStatus' => 'required|integer',
+                'RejectReason'   => 'nullable|string',
+
+                'SelectedProducts' => 'nullable|array',
+            ]);
+
+            DB::transaction(function () use ($validatedData, $poId) {
+
+                $purchaseOrder = PurchaseOrder::findOrFail($poId);
+
+                $purchaseOrder->update([
+                    'reject_reason'   => $validatedData['RejectReason'] ?? null,
+                    'approval_status' => ApprovalStatus::from(
+                        $validatedData['ApprovalStatus']
+                    )->value,
+                ]);
+
+                // Only update stock & costs when APPROVED
+                if (
+                    !empty($validatedData['SelectedProducts']) &&
+                    $validatedData['ApprovalStatus'] == ApprovalStatus::APPROVED->value
+                ) {
+                    foreach ($validatedData['SelectedProducts'] as $product) {
+
+                        $poItem = PurchaseOrderItems::where('purchase_order_id', $poId)
+                            ->where('id', $product['ProductId'])
+                            ->first();
+
+                        if (!$poItem) {
+                            continue;
+                        }
+
+                        $poItem->update([
+                            'at_cost' => $product['AtCostPrice'],
+                        ]);
+
+                        // $masterProduct = Products::find($poItem->product_id);
+
+                        // if ($masterProduct) {
+                        //     $masterProduct->quantity +=
+                        //         ($product['Quantity'] * $masterProduct->reflenish_amount);
+
+                        //     $masterProduct->save();
+                        // }
+                    }
+                }
+            });
+
+            return ResponseHelper::successResponse(200, "Success");
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
+        }
+    }
+
+    public function ReceiveDelivery($poId)
+    {
+        try {
+
+            $purchaseOrder = PurchaseOrder::findOrFail($poId);
+
+
+            foreach ($purchaseOrder->purchaseOrderItems as $product) {
+                $masterProduct = Products::find($product->product_id);
+
+                if ($masterProduct) {
+                    $masterProduct->quantity +=
+                        ($product->quantity * $masterProduct->reflenish_amount);
+
+                    $masterProduct->save();
+                }
+            }
+
+            $purchaseOrder->approval_status = ApprovalStatus::RECEIVED->value;
+            $purchaseOrder->save();
+
+            return ResponseHelper::successResponse(200, "Success");
         } catch (\Throwable $th) {
             return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
         }

@@ -44,6 +44,10 @@ class UserAccessHelper
                 UserAccess::TODAYS_APPOINTMENT->value,
                 UserAccess::ADD_VITAL_SIGN->value,
             ];
+        } else if ($roleEnum === UserRoles::PROCUREMENT) {
+            return [
+                UserAccess::PROCUREMENT_APPROVAL->value,
+            ];
         }
 
         return [];
