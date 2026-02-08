@@ -25,12 +25,11 @@ class DashboardService implements IDashboardService
     public function GetPurchaseOrderAtCostChart(DashboardFilterDTO $request): array
     {
         try {
-            // 1. Get periods (same logic as .NET)
             $periods = DashboardDateHelper::getChartPeriods($request);
             $datePeriods = DashboardDateHelper::getPeriods($request);
 
             $purchaseOrders = PurchaseOrder::with('purchaseOrderItems')
-                ->where('approval_status', ApprovalStatus::RECEIVED->value) // optional
+                ->where('approval_status', ApprovalStatus::RECEIVED->value)
                 ->where('created_at', '>=', $datePeriods['current_start'])
                 ->where('created_at', '<', $datePeriods['current_end'])
                 ->get();
@@ -172,7 +171,6 @@ class DashboardService implements IDashboardService
                 'reason_counts' => $reasonCounts,
             ];
 
-            // Step 2: Build prompt
             $prompt = "
                 You are an AI analyzing school clinic appointments.
 
@@ -317,7 +315,6 @@ class DashboardService implements IDashboardService
                 ];
             }
 
-            // Optional: sort by count descending (like dashboards usually do)
             usort($response, fn($a, $b) => $b['count'] <=> $a['count']);
 
             return ResponseHelper::successWData(200, 'Success', $response);
@@ -336,14 +333,18 @@ class DashboardService implements IDashboardService
             $periods = DashboardDateHelper::getChartPeriods($request);
 
             $reasonLabels = [
-                AppointmentReasons::FEVER_OR_FLU_LIKE_SYMPTOMS->value => 'Fever/Flu',
-                AppointmentReasons::HEADACHE_OR_MIGRAINE->value => 'Headache',
-                AppointmentReasons::STOMACHACHE_OR_DIGESTIVE_PROBLEMS->value => 'Digestive',
-                AppointmentReasons::MINOR_INJURY_OR_ACCIDENT->value => 'Injury',
-                AppointmentReasons::ALLERGY_OR_ASTHMA_RELATED_SYMPTOMS->value => 'Allergy/Asthma',
-                AppointmentReasons::FOLLOW_UP_CHECK_UP->value => 'Follow-up',
-                AppointmentReasons::OTHER_HEALTH_CONCERNS->value => 'Other',
+                AppointmentReasons::FEVER_OR_FLU_LIKE_SYMPTOMS->value              => 'Fever/Flu',
+                AppointmentReasons::HEADACHE_OR_MIGRAINE->value                   => 'Headache/Migraine',
+                AppointmentReasons::STOMACHACHE_OR_DIGESTIVE_PROBLEMS->value      => 'Stomach/Digestive',
+                AppointmentReasons::MINOR_INJURY_OR_ACCIDENT->value               => 'Minor Injury/Accident',
+                AppointmentReasons::ALLERGY_OR_ASTHMA_RELATED_SYMPTOMS->value     => 'Allergy/Asthma',
+                AppointmentReasons::DENTAL_PAIN_OR_ORAL_HEALTH_CONCERNS->value    => 'Dental/Oral Health',
+                AppointmentReasons::SKIN_CONDITIONS_OR_RASHES->value              => 'Skin Conditions/Rashes',
+                // AppointmentReasons::MEDICAL_CLEARANCE_OR_HEALTH_CERTIFICATION->value => 'Medical Clearance/Health Certificate',
+                AppointmentReasons::FOLLOW_UP_CHECK_UP->value                     => 'Follow-up Check-up',
+                AppointmentReasons::OTHER_HEALTH_CONCERNS->value                  => 'Other Health Concerns',
             ];
+
 
             $result = [];
 
@@ -352,7 +353,6 @@ class DashboardService implements IDashboardService
                 $end = $period['end'];
                 $label = $period['label'];
 
-                // Fetch counts for this period
                 $appointments = Appointment::select('reason')
                     ->where('created_at', '>=', $start)
                     ->where('created_at', '<', $end)
@@ -360,7 +360,6 @@ class DashboardService implements IDashboardService
                     ->groupBy('reason')
                     ->map(fn($g) => $g->count());
 
-                // Build reasons object
                 $reasons = [];
                 foreach ($reasonLabels as $reasonValue => $reasonName) {
                     $reasons[$reasonName] = $appointments[$reasonValue] ?? 0;
@@ -372,14 +371,12 @@ class DashboardService implements IDashboardService
                 ];
             }
 
-            // Step 2: Build AI prompt
             $prompt = "
             You are an AI analyzing school clinic appointment trends.
 
             Analyze the following appointment data and generate a **single, cohesive AI Insight paragraph**. 
             Focus on:
 
-            - Key trends over the past 4 weeks
             - Most common reasons for visits
             - Whether visits are increasing, decreasing, or stable
             - Actionable suggestions or recommendations if patterns emerge
@@ -392,7 +389,6 @@ class DashboardService implements IDashboardService
             ";
 
 
-            // Send prompt to Gemini AI
             $aiResponse = $this->geminiService->sendPrompt($prompt);
             $aiInsight = $aiResponse ?? "No AI insight available";
 

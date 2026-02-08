@@ -24,6 +24,12 @@ class UserAccessHelper
                 UserAccess::ADD_VITAL_SIGN->value,
                 UserAccess::ALL_PRODUCTS->value,
                 UserAccess::MODIFY_PRODUCTS->value,
+                UserAccess::MEDICAL_RECORDS->value,
+                UserAccess::ALL_WALKINS->value,
+                UserAccess::ALL_PATIENTS->value,
+                UserAccess::VIEW_MEDICAL_DATA->value,
+                UserAccess::CREATE_MEDICAL_CERT->value,
+                UserAccess::REQUEST_CERTIFICATES->value,
             ];
 
             return $default_access;
@@ -31,11 +37,18 @@ class UserAccessHelper
             return [
                 UserAccess::STUDENT_DASHBOARD->value,
                 UserAccess::APPOINTMENTS->value,
+                UserAccess::STUDENT_MEDICAL_RECORDS->value,
+                UserAccess::VIEW_MEDICAL_DATA->value,
+                UserAccess::REQUEST_CERTIFICATES->value,
+
             ];
         } else if ($roleEnum === UserRoles::DOCTORS) {
             return [
                 UserAccess::DOCTOR_DASHBOARD->value,
                 UserAccess::DOCTOR_APPOINTMENTS->value,
+                UserAccess::VIEW_MEDICAL_DATA->value,
+                UserAccess::CREATE_MEDICAL_CERT->value,
+                UserAccess::REQUEST_CERTIFICATES->value,
             ];
         } else if ($roleEnum === UserRoles::STAFF) {
             return [
@@ -43,6 +56,7 @@ class UserAccessHelper
                 UserAccess::OVERALL_APPOINTMENTS->value,
                 UserAccess::TODAYS_APPOINTMENT->value,
                 UserAccess::ADD_VITAL_SIGN->value,
+                UserAccess::VIEW_MEDICAL_DATA->value
             ];
         } else if ($roleEnum === UserRoles::PROCUREMENT) {
             return [

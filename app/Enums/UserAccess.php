@@ -28,4 +28,13 @@ enum UserAccess: int
     case ALL_PRODUCTS = 10;
     case MODIFY_PRODUCTS = 11;
     case PROCUREMENT_APPROVAL = 12;
+    case MEDICAL_RECORDS = 13;
+
+    case ALL_WALKINS = 14;
+    case ALL_PATIENTS = 15;
+
+    case STUDENT_MEDICAL_RECORDS = 16;
+    case VIEW_MEDICAL_DATA = 17;
+    case CREATE_MEDICAL_CERT = 18;
+    case REQUEST_CERTIFICATES = 19;
 }

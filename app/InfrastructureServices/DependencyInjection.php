@@ -25,6 +25,8 @@ use App\Services\ProductService\IProductService;
 use App\Services\ProductService\ProductService;
 use App\Services\UserService\IUserService;
 use App\Services\UserService\UserService;
+use App\Services\WalkinService\IWalkinService;
+use App\Services\WalkinService\WalkinService;
 
 class DependencyInjection
 {
@@ -40,5 +42,6 @@ class DependencyInjection
         $app->bind(IProductService::class, ProductService::class);
         $app->bind(IDashboardService::class, DashboardService::class);
         $app->bind(IGeminiService::class, GeminiService::class);
+        $app->bind(IWalkinService::class, WalkinService::class);
     }
 }

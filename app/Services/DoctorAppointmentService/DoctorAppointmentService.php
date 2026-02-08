@@ -13,6 +13,7 @@ use App\Models\Scheduling\Appointment;
 use App\Response\ResponseHelper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -31,6 +32,7 @@ class DoctorAppointmentService implements IDoctorAppointmentService
         try {
             $userDetailsId = UserHelper::getUserDetailsId();
             $doctor = DoctorDetails::where('user_details_id', $userDetailsId)->first();
+
             $query = Appointment::query()
                 ->where('status', '!=', AppointmentStatus::CHECKUP_DONE->value)
                 ->search(
@@ -56,6 +58,14 @@ class DoctorAppointmentService implements IDoctorAppointmentService
                 );
             }
 
+            if ($request->AppointmentType !== null) {
+                $type = AppointmentType::tryFrom((int) $request->AppointmentType);
+
+                if ($type) {
+                    $query->where('type', $type->value);
+                }
+            }
+
             $count = $query->count();
 
             $appointments = $query
@@ -79,7 +89,9 @@ class DoctorAppointmentService implements IDoctorAppointmentService
 
                 return [
                     'Id' => $appointment->id,
-                    'FullName' => $appointment->userDetails->first_name . ' ' . $appointment->userDetails->last_name,
+                    'FullName' => $appointment->userDetails()->exists()
+                        ? $appointment->userDetails->first_name . ' ' . $appointment->userDetails->last_name
+                        : $appointment->walkin->first_name . ' ' . $appointment->walkin->last_name,
                     'AppointmentDate' => $appointment->appointment_date->toDateString(),
                     'AppointmentTime' => $appointment->appointment_time,
                     'Doctor' => $appointmentDoctor ? [

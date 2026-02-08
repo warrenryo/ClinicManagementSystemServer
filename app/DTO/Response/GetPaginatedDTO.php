@@ -10,18 +10,21 @@ class GetPaginatedDTO
     public ?string $SearchValue = null;
     public ?string $Date = null;
     public ?int $ApprovalStatus = null;
+    public ?int $AppointmentType = null;
 
     public function __construct(
         int $Take,
         int $Skip,
         ?string $SearchValue,
         ?string $Date,
-        ?int $ApprovalStatus
+        ?int $ApprovalStatus,
+        ?int $AppointmentType
     ) {
         $this->Take = $Take;
         $this->Skip = $Skip;
         $this->SearchValue = $SearchValue;
         $this->Date = $Date;
         $this->ApprovalStatus = $ApprovalStatus;
+        $this->AppointmentType = $AppointmentType;
     }
 }

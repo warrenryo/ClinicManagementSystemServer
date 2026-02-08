@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Helpers\QuerySearch;
 use App\InfrastructureServices\AddInfrastructureService;
 use App\InfrastructureServices\DependencyInjection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 

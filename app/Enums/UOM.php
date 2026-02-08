@@ -18,4 +18,9 @@ enum UOM: int
     case PAIR = 11;
     case UNIT = 12;
     case SET = 13;
+
+    public function label(): string
+    {
+        return str_replace('_', ' ', ucwords(strtolower($this->name)));
+    }
 }

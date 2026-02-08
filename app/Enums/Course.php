@@ -23,4 +23,10 @@ enum Course: int
 
         // LIBRARY SCIENCE
     case BACHELOR_OF_LIBRARY_AND_INFORMATION_SCIENCE = 8;
+
+
+    public function label(): string
+    {
+        return str_replace('_', ' ', ucwords(strtolower($this->name)));
+    }
 }

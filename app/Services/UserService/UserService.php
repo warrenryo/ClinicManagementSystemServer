@@ -10,9 +10,11 @@ use App\Helpers\Token;
 use App\Models\Auth\DoctorDetails;
 use App\Models\Auth\User;
 use App\Models\Auth\UserDetails;
+use App\Models\Scheduling\Walkin;
 use Illuminate\Http\Request;
 use App\Response\ResponseHelper;
 use App\Services\UserService\IUserService;
+use Carbon\Carbon;
 
 class UserService implements IUserService
 {
@@ -221,6 +223,157 @@ class UserService implements IUserService
             return ResponseHelper::successWData(200, "Success", $paginated_response);
         } catch (\Throwable $th) {
             return ResponseHelper::errorResponse(500, "{$th->getMessage()}");
+        }
+    }
+
+    public function GetAllPatientsPaginated(GetPaginatedDTO $request)
+    {
+        try {
+            $userQuery = UserDetails::query()
+                ->whereHas('user', function ($q) {
+                    $q->whereNotIn('role', [
+                        UserRoles::DOCTORS->value,
+                        UserRoles::STAFF->value,
+                        UserRoles::SUPERUSER->value,
+                        UserRoles::PROCUREMENT->value,
+                    ]);
+                })
+                ->when($request->SearchValue, function ($q) use ($request) {
+                    $q->where(function ($q2) use ($request) {
+                        $q2->where('first_name', 'like', "%{$request->SearchValue}%")
+                            ->orWhere('last_name', 'like', "%{$request->SearchValue}%");
+                    });
+                });
+
+            $users = $userQuery->get()->map(function ($user) {
+                return [
+                    'Id'          => $user->id,
+                    'FullName'    => $user->first_name . ' ' . $user->last_name,
+                    'Role'        => $user->user->role,
+                    'Birthdate'   => null,
+                    'PatientType' => 'USER PATIENT',
+                ];
+            });
+
+            $walkinQuery = Walkin::query()
+                ->when($request->SearchValue, function ($q) use ($request) {
+                    $q->where(function ($q2) use ($request) {
+                        $q2->where('first_name', 'like', "%{$request->SearchValue}%")
+                            ->orWhere('last_name', 'like', "%{$request->SearchValue}%");
+                    });
+                });
+
+            $walkins = $walkinQuery->get()->map(function ($walkin) {
+                return [
+                    'Id'          => $walkin->id,
+                    'FullName'    => $walkin->first_name . ' ' . $walkin->last_name,
+                    'Role'        => null,
+                    'Birthdate'   => $walkin->birthdate,
+                    'PatientType' => 'WALKIN PATIENT',
+                ];
+            });
+
+            $patients = $users->merge($walkins);
+
+            $patients = $patients->sortBy('FullName')->values();
+
+            $total = $patients->count();
+            $data = $patients->slice($request->Skip, $request->Take)->values()->toArray();
+
+            $paginatedResponse = new PaginatedTableResponse($data, $total);
+
+            return ResponseHelper::successWData(200, "Success", $paginatedResponse);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, $th->getMessage());
+        }
+    }
+
+    public function GetUserProfileDetails($user_details_id)
+    {
+        try {
+            $user_details = UserDetails::findOrFail($user_details_id);
+
+            $data = [
+                'UserDetailsId' => $user_details->id,
+                'FullName' => $user_details->first_name . ' ' . $user_details->last_name,
+                'Role' => $user_details->user->role,
+                'Email' => $user_details->user->email,
+                'Phone' => $user_details->phone,
+                'Address' => $user_details->address,
+                'DateOfBirth' => $user_details->birth_date,
+                'Gender' => $user_details->gender,
+                'AvatarUrl' => $user_details->profile_img,
+                'TeacherDetails' => $user_details->employeeDetails()->exists()
+                    ? [
+                        'Department' => $user_details->employeeDetails->department,
+                        'Position' => $user_details->employeeDetails->position,
+                    ] : null,
+                'StudentDetails' => $user_details->studentDetails()->exists()
+                    ? [
+                        'StudentNo' => $user_details->studentDetails->student_number,
+                        'Course' => $user_details->studentDetails->course,
+                        'YearLevel' => $user_details->studentDetails->year_level
+                    ] : null,
+            ];
+
+            return ResponseHelper::successWData(200, "Success", $data);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, $th->getMessage());
+        }
+    }
+
+    public function GetUserMedicalRecords($user_details_id)
+    {
+        try {
+            $user_details = UserDetails::findOrFail($user_details_id);
+
+            $data = $user_details->medicalRecords()->exists() ? $user_details->medicalRecords->map(function ($med) {
+                return [
+                    'recordId' => $med->id,
+                    'referenceNo' => $med->reference_no,
+                    'visitDate' => $med->appointment->appointment_date,
+                    'visitTime' => $med->appointment->appointment_time,
+                    'reason' => $med->appointment->reason,
+                    'doctor' => $med->doctorDetails->userDetails->first_name . ' ' . $med->doctorDetails->userDetails->last_name,
+                    'findings' => $med->findings,
+                    'createdAt' => $med->created_at
+                ];
+            })->toArray() : null;
+
+            return ResponseHelper::successWData(200, "Success", $data);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, $th->getMessage());
+        }
+    }
+
+    public function GetUserAppointments(Request $request, $user_details_id)
+    {
+        try {
+
+            $month = $request->query('month');
+            $year  = $request->query('year');
+
+            $userDetails = UserDetails::findOrFail($user_details_id);
+
+            $appointments = $userDetails->appointment()
+                ->whereMonth('appointment_date', $month)
+                ->whereYear('appointment_date', $year)
+                ->get()
+                ->map(function ($apt) {
+                    return [
+                        'appointmentId' => $apt->id,
+                        'date' => $apt->appointment_date,
+                        'time' => $apt->appointment_time,
+                        'reason' => $apt->reason,
+                        'status' => $apt->status,
+                        'doctor' => null,
+                        'notes' => $apt->notes,
+                    ];
+                });
+
+            return ResponseHelper::successWData(200, "Success", $appointments);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(500, $th->getMessage());
         }
     }
 }

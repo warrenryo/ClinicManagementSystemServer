@@ -63,7 +63,7 @@ class GeminiService implements IGeminiService
                     'messages' => [
                         [
                             'role' => 'user',
-                            'content' => $prompt,  // <-- safe, dynamically passed
+                            'content' => $prompt,
                         ]
                     ],
                     'max_tokens' => 600,

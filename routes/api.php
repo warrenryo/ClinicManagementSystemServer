@@ -11,6 +11,7 @@ use App\Http\Controllers\LocalUploadController;
 use App\Http\Controllers\MedicalRecordsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalkinController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -32,6 +33,14 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 
+Route::group(['prefix' => 'walkin'], function () {
+    Route::controller(WalkinController::class)->group(function () {
+        Route::post('verify-student', 'VerifyStudentNo');
+        Route::post('create-walkin', 'CreateWalkinAppointment');
+    });
+});
+
+
 
 Route::middleware(['authenticate.user.token'])->group(function () {
     Route::group(['prefix' => 'azureblob'], function () {
@@ -48,14 +57,16 @@ Route::middleware(['authenticate.user.token'])->group(function () {
         });
     });
 
-
-
     Route::group(['prefix' => 'users'], function () {
         Route::controller(UserController::class)->group(function () {
             Route::get('get-all-users-paginated', 'GetAllUserPaginated');
             Route::put('toggle-user-status/{id}', 'ToggleUserStatus');
             Route::get('get-all-users-list', 'GetAllUsersList');
             Route::get('get-all-doctors-paginated', 'GetAllDoctorsPaginated');
+            Route::get('get-all-patients-paginated', 'GetAllPatientsPaginated');
+            Route::get('get-user-profile/{user_details_id}', 'GetUserProfileDetails');
+            Route::get('get-user-medical-records/{user_details_id}', 'GetUserMedicalRecords');
+            Route::get('get-user-appointments/{user_details_id}', 'GetUserAppointments');
         });
     });
 
@@ -87,6 +98,16 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::post('add-vital-sign/{appointmentId}', 'AddVitalSign');
             Route::get('get-initial-records/{appointmentId}', 'GetAppointmentMedical');
             Route::post('create-medical-records', 'CreateMedicalRecord');
+            Route::get('get-records-paginated', 'GetAllMedicalRecords');
+            Route::get('view-medical-record/{medId}', 'ViewMedicalRecordData');
+            Route::post('export-medical-pdf/{medId}', 'exportMedicalRecordPdf');
+            Route::post('request-medical-records/{medical_records_id}', 'RequestMedicalCertificate');
+            Route::get('get-records-request-paginated', 'RequestCertificatePaginated');
+            Route::get('get-medical-request-form-initial/{reqId}', 'GetRequestCertFormDetails');
+            Route::post('ai-assisted-med-cert/{medId}', 'AIAssistedCertificate');
+            Route::post('create-certificate', 'CreateMedicalCertificate');
+            Route::get('view-certificate/{medId}', 'ViewMedicalCertificate');
+            Route::get('list-medical-records/{userDetailsId}', 'GetMedicalCertificates');
         });
     });
 
