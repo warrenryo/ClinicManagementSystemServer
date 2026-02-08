@@ -38,7 +38,8 @@ class GetPaginatedRequest extends FormRequest
             Skip: $this->input('Skip', 0),
             SearchValue: $this->input('SearchValue'),
             Date: $this->input('Date'),
-            ApprovalStatus: $this->input('ApprovalStatus')
+            ApprovalStatus: $this->input('ApprovalStatus'),
+            AppointmentType: $this->input('AppointmentType'),
         );
     }
 }

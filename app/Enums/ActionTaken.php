@@ -2,12 +2,13 @@
 
 namespace App\Enums;
 
-enum YearLevel: int
+enum ActionTaken: int
 {
-    case FIRST_YEAR = 0;
-    case SECOND_YEAR = 1;
-    case THIRD_YEAR = 2;
-    case FOURTH_YEAR = 3;
+    case RESTED = 0;
+    case MEDICATION_GIVEN = 1;
+    case SENT_HOME = 2;
+    case FIRST_AID = 3;
+    case REFERRED = 4;
 
     public function label(): string
     {

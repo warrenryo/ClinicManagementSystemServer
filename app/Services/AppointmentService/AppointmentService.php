@@ -190,7 +190,8 @@ class AppointmentService implements IAppointmentService
     public function GetOverallAppointments(GetPaginatedDTO $request)
     {
         try {
-            $query = Appointment::query();
+            $query = Appointment::query()
+                ->where('type', $request->AppointmentType);
 
             $count = $query->count();
 
@@ -211,7 +212,9 @@ class AppointmentService implements IAppointmentService
 
                 return [
                     'Id' => $appointment->id,
-                    'FullName' => $appointment->userDetails->first_name . ' ' . $appointment->userDetails->last_name,
+                    'FullName' => $appointment->userDetails()->exists()
+                        ? $appointment->userDetails->first_name . ' ' . $appointment->userDetails->last_name
+                        : $appointment->walkin->first_name . ' ' . $appointment->walkin->last_name,
                     'AppointmentDate' => $appointment->appointment_date->toDateString(),
                     'AppointmentTime' => $appointment->appointment_time,
                     'Doctor' => $doctorDetails ? [

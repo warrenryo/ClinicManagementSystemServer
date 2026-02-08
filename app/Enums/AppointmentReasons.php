@@ -16,4 +16,9 @@ enum AppointmentReasons: int
     case MEDICAL_CLEARANCE_OR_HEALTH_CERTIFICATION = 7;
     case FOLLOW_UP_CHECK_UP = 8;
     case OTHER_HEALTH_CONCERNS = 9;
+
+    public function label(): string
+    {
+        return str_replace('_', ' ', ucwords(strtolower($this->name)));
+    }
 }

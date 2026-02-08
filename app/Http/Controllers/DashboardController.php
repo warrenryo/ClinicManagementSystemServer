@@ -97,4 +97,19 @@ class DashboardController extends Controller
         $reponse = $this->dashboardService->GetAppointmentReasonsTrend($dto);
         return ResponseHelper::getStatusResponse($reponse);
     }
+
+    public function GetDashboardCardCounts(Request $request)
+    {
+        $dto = new DashboardFilterDTO(
+            startDate: $request->StartDate,
+            endDate: $request->EndDate,
+            dateTime: $request->DateTime,
+            filterTimeIntervals: $request->FilterTimeIntervals !== null
+                ? FilterTimeIntervals::from((int) $request->FilterTimeIntervals)
+                : null
+        );
+
+        $response = $this->dashboardService->GetDashboardCardCounts($dto);
+        return ResponseHelper::getStatusResponse($response);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Models\Auth;
 
 use App\Helpers\SearchableTrait;
+use App\Models\Medical\MedicalRecords;
 use App\Models\Scheduling\AppointmentDoctors;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,5 +25,10 @@ class DoctorDetails extends Model
     public function appointmentDoctors()
     {
         return $this->hasMany(AppointmentDoctors::class, 'doctor_id', 'id');
+    }
+
+    public function medicalRecords()
+    {
+        return $this->hasMany(MedicalRecords::class, 'doctor_id', 'id');
     }
 }

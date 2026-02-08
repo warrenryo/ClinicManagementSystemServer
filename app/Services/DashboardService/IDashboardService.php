@@ -13,4 +13,5 @@ interface IDashboardService
     public function GetLatestAISummary();
     public function GetAppointmentReasonDistribution(DashboardFilterDTO $request);
     public function GetAppointmentReasonsTrend(DashboardFilterDTO $request);
+    public function GetDashboardCardCounts(DashboardFilterDTO $request);
 }

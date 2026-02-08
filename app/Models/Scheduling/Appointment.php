@@ -14,6 +14,7 @@ class Appointment extends Model
 
     protected $fillable = [
         'user_details_id',
+        'walkin_id',
         'appointment_date',
         'appointment_time',
         'reason',
@@ -42,5 +43,10 @@ class Appointment extends Model
     public function medicalRecords()
     {
         return $this->hasOne(MedicalRecords::class, 'appointment_id', 'id');
+    }
+
+    public function walkin()
+    {
+        return $this->belongsTo(Walkin::class, 'walkin_id', 'id');
     }
 }

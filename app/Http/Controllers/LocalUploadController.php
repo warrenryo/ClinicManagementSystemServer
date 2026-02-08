@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Interface\LocalUploadInterface;
 use App\Response\ResponseHelper;
+use App\Services\LocalUploadService\ILocalUploadService;
 
 class LocalUploadController extends Controller
 {
     protected $localUploadService;
 
-    public function __construct(LocalUploadInterface $localUploadService)
+    public function __construct(ILocalUploadService $localUploadService)
     {
         $this->localUploadService = $localUploadService;
     }

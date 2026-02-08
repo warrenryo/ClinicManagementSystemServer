@@ -3,6 +3,8 @@
 namespace App\Services\AuthService;
 
 use App\Enums\Course;
+use App\Enums\Department;
+use App\Enums\Position;
 use App\Enums\UserRoles;
 use App\Enums\YearLevel;
 use App\Helpers\Token;
@@ -11,6 +13,7 @@ use App\Models\Auth\User;
 use Illuminate\Http\Request;
 use App\Response\ResponseHelper;
 use App\Services\AuthService\IAuthService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -68,6 +71,8 @@ class AuthService implements IAuthService
                 'user_access' => UserAccessHelper::UserDefaultAccess($request['SystemRole'])
             ]);
 
+            $birthDate = Carbon::parse($request['BirthDate'])->toDateString();
+
             $userDetails = $user->userDetails()->create([
                 'first_name' => $request['FirstName'],
                 'last_name' => $request['LastName'],
@@ -76,6 +81,8 @@ class AuthService implements IAuthService
                 'city' => $request['City'],
                 'postal_code' => $request['PostalCode'],
                 'profile_img' => $request['ProfileImg'] ?? null,
+                'birth_date' => $birthDate,
+                'gender' => $request['Gender']
             ]);
 
             if ($request['SystemRole'] === UserRoles::STUDENTS->value) {
@@ -90,6 +97,14 @@ class AuthService implements IAuthService
                 $userDetails->doctorDetails()->create([
                     'specialization' => $request['Specialization'],
                     'license_number' => $request['LicenseNumber'],
+                ]);
+            }
+
+            if ($request['SystemRole'] === UserRoles::TEACHERS->value) {
+                $userDetails->employeeDetails()->create([
+                    'employee_no' => $request['EmployeeNo'],
+                    'department' => Department::from($request['Department'])->value,
+                    'position' => Position::from($request['Position'])->value,
                 ]);
             }
 

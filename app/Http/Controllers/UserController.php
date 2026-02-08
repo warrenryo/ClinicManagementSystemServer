@@ -77,4 +77,29 @@ class UserController extends Controller
         $status = $this->userService->GetAllDoctorsPaginated($dto);
         return ResponseHelper::getStatusResponse($status);
     }
+
+    public function GetAllPatientsPaginated(GetPaginatedRequest $request)
+    {
+        $dto = $request->toDTO();
+        $status = $this->userService->GetAllPatientsPaginated($dto);
+        return ResponseHelper::getStatusResponse($status);
+    }
+
+    public function GetUserProfileDetails($user_details_id)
+    {
+        $status = $this->userService->GetUserProfileDetails($user_details_id);
+        return ResponseHelper::getStatusResponse($status);
+    }
+
+    public function GetUserMedicalRecords($user_details_id)
+    {
+        $status = $this->userService->GetUserMedicalRecords($user_details_id);
+        return ResponseHelper::getStatusResponse($status);
+    }
+
+    public function GetUserAppointments(Request $request, $user_details_id)
+    {
+        $status = $this->userService->GetUserAppointments($request, $user_details_id);
+        return ResponseHelper::getStatusResponse($status);
+    }
 }
