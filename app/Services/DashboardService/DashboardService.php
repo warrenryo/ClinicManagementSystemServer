@@ -8,11 +8,15 @@ use App\Enums\AppointmentStatus;
 use App\Enums\ApprovalStatus;
 use App\Helpers\DashboardDateHelper;
 use App\Models\Gemini\AISummary;
+use App\Models\Inventory\Products;
 use App\Models\Inventory\PurchaseOrder;
+use App\Models\Medical\MedicalRecords;
 use App\Models\Scheduling\Appointment;
 use App\Response\ResponseHelper;
 use App\Services\GeminiService\IGeminiService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Request;
 
 class DashboardService implements IDashboardService
 {
@@ -402,5 +406,113 @@ class DashboardService implements IDashboardService
                 "Something went wrong: {$th->getMessage()}"
             );
         }
+    }
+
+    public function GetDashboardCardCounts(DashboardFilterDTO $request)
+    {
+        try {
+            $datePeriods = DashboardDateHelper::getPeriods($request);
+
+            // Current period counts
+            $currentAppointments = Appointment::where('created_at', '>=', $datePeriods['current_start'])
+                ->where('created_at', '<', $datePeriods['current_end'])
+                ->count();
+
+            $currentProducts = Products::count();
+
+            $currentStockAlerts = Products::where('quantity', '<', DB::raw('min_qty'))
+                ->where('created_at', '>=', $datePeriods['current_start'])
+                ->where('created_at', '<', $datePeriods['current_end'])
+                ->count();
+
+            $currentMedicalRecords = MedicalRecords::where('created_at', '>=', $datePeriods['current_start'])
+                ->where('created_at', '<', $datePeriods['current_end'])
+                ->count();
+
+            // Previous period counts
+            $previousAppointments = Appointment::where('created_at', '>=', $datePeriods['prev_start'])
+                ->where('created_at', '<', $datePeriods['prev_end'])
+                ->count();
+
+            $previousProducts = Products::where('created_at', '>=', $datePeriods['prev_start'])
+                ->where('created_at', '<', $datePeriods['prev_end'])
+                ->count();
+
+            $previousStockAlerts = Products::where('quantity', '<', DB::raw('min_qty'))
+                ->where('created_at', '>=', $datePeriods['prev_start'])
+                ->where('created_at', '<', $datePeriods['prev_end'])
+                ->count();
+
+            $previousMedicalRecords = MedicalRecords::where('created_at', '>=', $datePeriods['prev_start'])
+                ->where('created_at', '<', $datePeriods['prev_end'])
+                ->count();
+
+            // Calculate trends
+            $appointmentsTrend = $this->calculateTrend($currentAppointments, $previousAppointments);
+            $productsTrend = $this->calculateTrend($currentProducts, $previousProducts);
+            $stockAlertsTrend = $this->calculateTrend($currentStockAlerts, $previousStockAlerts);
+            $medicalRecordsTrend = $this->calculateTrend($currentMedicalRecords, $previousMedicalRecords);
+
+            $response = [
+                'appointments' => [
+                    'count' => $currentAppointments,
+                    'trend' => $appointmentsTrend['trend'],
+                    'trendPercentage' => $appointmentsTrend['percentage'],
+                ],
+                'products' => [
+                    'count' => $currentProducts,
+                    'trend' => $productsTrend['trend'],
+                    'trendPercentage' => $productsTrend['percentage'],
+                ],
+                'stockAlerts' => [
+                    'count' => $currentStockAlerts,
+                    'trend' => $stockAlertsTrend['trend'],
+                    'trendPercentage' => $stockAlertsTrend['percentage'],
+                ],
+                'medicalRecords' => [
+                    'count' => $currentMedicalRecords,
+                    'trend' => $medicalRecordsTrend['trend'],
+                    'trendPercentage' => $medicalRecordsTrend['percentage'],
+                ],
+            ];
+
+            return ResponseHelper::successWData(200, 'Success', $response);
+        } catch (\Throwable $th) {
+            return ResponseHelper::errorResponse(
+                500,
+                "Something went wrong: {$th->getMessage()}"
+            );
+        }
+    }
+
+    private function calculateTrend($current, $previous)
+    {
+        if ($previous === 0 && $current > 0) {
+            return [
+                'trend' => 'up',
+                'percentage' => 100,
+            ];
+        } elseif ($previous === 0) {
+            return [
+                'trend' => 'stable',
+                'percentage' => 0,
+            ];
+        }
+
+        $change = (($current - $previous) / $previous) * 100;
+        $percentage = round($change);
+
+        if ($change > 2) {
+            $trend = 'up';
+        } elseif ($change < -2) {
+            $trend = 'down';
+        } else {
+            $trend = 'stable';
+        }
+
+        return [
+            'trend' => $trend,
+            'percentage' => abs($percentage),
+        ];
     }
 }

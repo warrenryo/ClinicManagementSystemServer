@@ -16,5 +16,6 @@ class Products extends Model
         'at_cost',
         'reflenish_amount',
         'quantity',
+        'min_qty'
     ];
 }

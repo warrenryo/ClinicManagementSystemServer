@@ -135,6 +135,7 @@ Route::middleware(['authenticate.user.token'])->group(function () {
             Route::get('get-latest-summary', 'GetLatestAISummary');
             Route::get('get-appointment-reason-distribution', 'GetAppointmentReasonDistribution');
             Route::get('get-appointment-reason-trend', 'GetAppointmentReasonTrend');
+            Route::get('get-dashboard-count', 'GetDashboardCardCounts');
         });
     });
 });
